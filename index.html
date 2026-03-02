@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📦 鳳梨宅配訂購系統</title>
+    <title>🍍 鳳梨宅配訂購系統</title>
     <style>
         :root { --primary: #28a745; --bg: #f8f9fa; --accent: #d9534f; }
         body { font-family: "Microsoft JhengHei", sans-serif; background: var(--bg); padding: 10px; margin: 0; font-size: 20px; }
@@ -15,20 +15,17 @@
         label { display: block; margin-bottom: 8px; font-weight: bold; color: #444; }
         input, textarea, select { width: 100%; padding: 15px; border: 2px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 20px; }
         input:focus { border-color: var(--primary); outline: none; }
-        
-        /* 匯款資訊樣式 */
         .payment-info { background: #fff4f4; border: 2px solid var(--accent); padding: 15px; border-radius: 10px; margin-top: 15px; display: none; }
         .payment-info b { color: var(--accent); font-size: 22px; }
-
         .receiver-block { border: 3px solid #eee; padding: 20px; border-radius: 15px; margin-bottom: 25px; background: #fff; position: relative; }
         .btn-add { background: #fff; color: var(--primary); border: 3px solid var(--primary); padding: 15px; border-radius: 10px; width: 100%; cursor: pointer; font-weight: bold; font-size: 20px; margin-bottom: 30px; }
         .btn-submit { background: var(--primary); color: white; border: none; padding: 22px; border-radius: 12px; width: 100%; font-size: 24px; font-weight: bold; cursor: pointer; box-shadow: 0 5px 15px rgba(40,167,69,0.4); }
-        .btn-submit:disabled { background: #6c757d; cursor: not-allowed; box-shadow: none; opacity: 0.8; }
-        
+        .btn-submit:disabled { background: #6c757d; cursor: not-allowed; opacity: 0.8; }
         .phone-input-group { display: flex; gap: 10px; align-items: center; }
         .phone-type { width: 40%; }
         .remove-link { color: #d9534f; text-align: right; display: block; margin-top: 10px; font-weight: bold; text-decoration: underline; cursor: pointer; }
         #loading { display: none; text-align: center; font-weight: bold; color: var(--primary); margin: 20px 0; }
+        .hint { font-size: 16px; color: #888; margin-top:5px; }
     </style>
 </head>
 <body>
@@ -53,7 +50,7 @@
                 </select>
                 <input type="tel" id="sPhone" placeholder="0912345678">
             </div>
-            <div id="sPhoneHint" style="font-size: 16px; color: #888; margin-top:5px;">格式：09開頭10位數字</div>
+            <div id="sPhoneHint" class="hint">格式：09開頭10位數字</div>
         </div>
 
         <div class="form-group">
@@ -70,11 +67,6 @@
                 <p style="margin-bottom:0; color:#333; font-size:18px;">※ 請在匯款單備註欄寫下：<br>「寄件人姓名」及「總訂購箱數」</p>
             </div>
         </div>
-
-        <div class="form-group">
-            <label>總備註</label>
-            <input type="text" id="note" placeholder="如：需中午前到">
-        </div>
     </div>
 
     <div id="receiverContainer"></div>
@@ -86,8 +78,8 @@
 </div>
 
 <script>
-    // ⚠️ 請在此貼上你的 Google GAS 網址
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyzw2VREENA2joGuy2PNhPAPaku-7vOxkTXp8QG71n32hg9_c9qMjhO29As31iG8FD6Bw/exec"; 
+    // ⚠️ 請貼上你最新部署的 GAS 網址
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx3aTt8l9OdNdmK4xr6aDZYNxSsKFbr2isjJoXtuX_uRLygdIsISLtMhVw6ZbwuS0TEzQ/exec"; 
 
     let receiverCount = 0;
     window.onload = () => addReceiver();
@@ -130,13 +122,15 @@
                     </select>
                     <input type="tel" class="rPhone" placeholder="0912345678">
                 </div>
-                <div class="rHint" style="font-size: 16px; color: #888; margin-top:5px;">格式：09開頭10位數字</div>
+                <div class="rHint" class="hint">格式：09開頭10位數字</div>
             </div>
-            <div class="form-group"><label>收件地址 *</label><textarea class="rAddr" rows="2"></textarea></div>
             <div class="form-group">
-                <label>訂購箱數 *</label>
-                <select class="rBoxCount">${options}</select>
+                <label>收件地址 *</label>
+                <textarea class="rAddr" rows="2" placeholder="請輸入完整地址 (需包含門牌號碼)"></textarea>
+                <div class="hint">鄉村地區地址請務必填寫「號」。</div>
             </div>
+            <div class="form-group"><label>訂購箱數 *</label><select class="rBoxCount">${options}</select></div>
+            <div class="form-group"><label>收件備註 (選填)</label><input type="text" class="rNote" placeholder="例如：管理室代收、下午配送"></div>
             ${receiverCount > 1 ? `<span class="remove-link" onclick="removeReceiver(${receiverCount})">✕ 移除此收件人</span>` : ''}
         `;
         container.appendChild(div);
@@ -167,7 +161,6 @@
         const sPhone = document.getElementById('sPhone').value.trim();
         const sPhoneType = document.getElementById('sPhoneType').value;
         const payMethod = document.getElementById('payMethod').value;
-        const note = document.getElementById('note').value.trim() || "無";
 
         if (!sName || !validatePhone(sPhone, sPhoneType)) return alert("寄件人資料或電話格式有誤！");
 
@@ -181,11 +174,13 @@
             const phoneType = blocks[i].querySelector('.rPhoneType').value;
             const addr = blocks[i].querySelector('.rAddr').value.trim();
             const boxCount = blocks[i].querySelector('.rBoxCount').value;
+            const note = blocks[i].querySelector('.rNote').value.trim() || "無";
             
+            // 地址邏輯放寬：只要有「號」就算通過
             if (!name || !validatePhone(phone, phoneType) || !addr.includes('號')) {
-                return alert(`收件人 #${i+1} 資料格式不正確（請檢查電話或地址）。`);
+                return alert(`收件人 #${i+1} 資料不完整。\n地址請確保輸入「號」，電話請符合格式。`);
             }
-            receiversData.push({ name, phone, addr, boxCount });
+            receiversData.push({ name, phone, addr, boxCount, note });
             totalBoxes += parseInt(boxCount);
         }
 
@@ -195,19 +190,18 @@
         document.getElementById('loading').style.display = 'block';
 
         const formData = new URLSearchParams({
-            "sName": sName, "sPhone": sPhone, "payMethod": payMethod, "note": note,
+            "sName": sName, "sPhone": sPhone, "payMethod": payMethod,
             "receiversJson": JSON.stringify(receiversData)
         });
 
         fetch(GOOGLE_SCRIPT_URL, { method: "POST", mode: "no-cors", body: formData });
 
         setTimeout(async () => {
-            const copyText = `【鳳梨訂單】寄件：${sName} / 總箱數：${totalBoxes}箱\n付款：${payMethod}\n訂單已送出，感謝您的訂購！`;
+            const copyText = `【鳳梨訂單】寄件：${sName} / 總計：${totalBoxes}箱\n付款：${payMethod}\n已送出存檔，感謝訂購！`;
             try { await navigator.clipboard.writeText(copyText); } catch (e) {}
 
             document.getElementById('loading').style.display = 'none';
-            alert(`🌟 訂單提交成功！\n\n感謝您的訂購，我們會盡快為您安排出貨。\n總計箱數：${totalBoxes} 箱\n\n(資料已複製，可回 Line 貼上告知賣家)`);
-            
+            alert(`🌟 訂單提交成功！\n\n感謝您的訂購，我們會盡快安排出貨。\n總計箱數：${totalBoxes} 箱\n\n(資料已複製，可回 Line 貼上告知賣家)`);
             btn.innerText = "✅ 訂單已完成送出";
         }, 1200);
     }
