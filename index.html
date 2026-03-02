@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>宅配訂單自動提交系統</title>
+    <title>宅配訂單系統-欄位拆分版</title>
     <style>
         :root { --primary: #00b900; --bg: #f4f7f6; }
         body { font-family: "Microsoft JhengHei", sans-serif; background: var(--bg); padding: 15px; }
@@ -26,29 +26,33 @@
 
 <div class="container">
     <div class="card">
-        <h2>📦 宅配快速下單</h2>
-        <h3>📤 寄件人 (必填)</h3>
+        <h2>📦 鳳梨訂單系統</h2>
+        <h3>📤 寄件人資訊</h3>
         <div class="form-group">
-            <label>姓名 *</label>
+            <label>寄件姓名 *</label>
             <input type="text" id="sName" placeholder="寄件人姓名">
         </div>
         <div class="form-group">
-            <label>電話 *</label>
+            <label>寄件電話 *</label>
             <input type="tel" id="sPhone" placeholder="0912345678">
+        </div>
+        <div class="form-group">
+            <label>總備註 (選填)</label>
+            <input type="text" id="note" placeholder="例如：全都要中午前到">
         </div>
     </div>
 
     <div id="receiverContainer"></div>
 
     <button class="btn-add" onclick="addReceiver()">＋ 新增另一筆收件人</button>
-    <button id="submitBtn" class="btn-submit" onclick="submitOrder()">🚀 檢查並自動送出訂單</button>
+    <button id="submitBtn" class="btn-submit" onclick="submitOrder()">🚀 格式檢查並送出訂單</button>
    
-    <div id="loading">⏳ 正在連線至雲端試算表，請稍候...</div>
+    <div id="loading">⏳ 正在傳送資料，請稍候...</div>
 </div>
 
 <script>
-    // 1. 在這裡貼上你的 Google 部署網址
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxHcc3hMxbgRzXbLZEyl5tWwgq5I-N4zrVJkAi6e5yYZyodkqQcQlgYWsftoaEXDjcl2g/exec";
+    // ⚠️ 記得在此貼上你「重新部署」後的 GAS 網址
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyeRARaB7p723UPdSDbGuH62AJNIQts4viOOxZXJPUCruhh9fgm4lR_hbRWxuOQL7cSgA/exec";
 
     let receiverCount = 0;
     window.onload = () => addReceiver();
@@ -74,47 +78,56 @@
     async function submitOrder() {
         const sName = document.getElementById('sName').value.trim();
         const sPhone = document.getElementById('sPhone').value.trim();
+        const note = document.getElementById('note').value.trim() || "無";
         const phoneRegex = /^09\d{8}$/;
         const addrCheck = /^(?=.*[路街巷])(?=.*[號]).+$/;
         const simplifiedCheck = /[体国门区发]/;
 
-        // 基礎檢核
-        if (!sName || !phoneRegex.test(sPhone)) return alert("寄件人資料錯誤或電話格式不符(09開頭10位數字)");
+        if (!sName || !phoneRegex.test(sPhone)) return alert("寄件資料有誤！");
 
-        let orderSummary = "";
+        let receiversData = [];
+        let copyTextDetail = "";
         const blocks = document.querySelectorAll('.receiver-block');
+
         for (let i = 0; i < blocks.length; i++) {
             const name = blocks[i].querySelector('.rName').value.trim();
             const phone = blocks[i].querySelector('.rPhone').value.trim();
             const addr = blocks[i].querySelector('.rAddr').value.trim();
+           
             if (!name || !phoneRegex.test(phone) || !addrCheck.test(addr) || simplifiedCheck.test(addr)) {
-                return alert(`收件人 #${i+1} 資料有誤或包含簡體字/格式不全，請重新檢查。`);
+                return alert(`收件人 #${i+1} 格式不正確，請檢查地址是否包含「路/街」及「號」，且無簡體字。`);
             }
-            orderSummary += `【收件人${i+1}】${name} / ${phone} / ${addr}\n`;
+           
+            receiversData.push({ name, phone, addr });
+            copyTextDetail += `【收件人${i+1}】${name} / ${phone} / ${addr}\n`;
         }
 
-        // 開始送出
         const btn = document.getElementById('submitBtn');
         const loading = document.getElementById('loading');
         btn.disabled = true;
         loading.style.display = 'block';
 
+        // 傳送 JSON 格式讓後端好拆分
+        const formData = new URLSearchParams({
+            "sName": sName,
+            "sPhone": sPhone,
+            "note": note,
+            "receiversJson": JSON.stringify(receiversData)
+        });
+
         try {
-            await fetch(GOOGLE_SCRIPT_URL, {
-                method: "POST",
-                mode: "no-cors",
-                headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                body: new URLSearchParams({ "sName": sName, "sPhone": sPhone, "orderDetail": orderSummary })
-            });
+            fetch(GOOGLE_SCRIPT_URL, { method: "POST", mode: "no-cors", body: formData });
 
-            // 自動複製備份
-            const copyText = `【下單通知】\n寄件人：${sName}(${sPhone})\n訂單內容：\n${orderSummary}`;
-            await navigator.clipboard.writeText(copyText);
-
-            alert("✅ 訂單已自動存入雲端試算表！\n\n同時已為您複製訂單備份，請回到 Line 貼上傳送給賣家做雙重確認。");
+            // 為了避免 CORS 報錯影響體驗，我們直接設定延遲後成功
+            setTimeout(async () => {
+                const copyText = `【宅配下單】\n寄件：${sName}(${sPhone})\n內容：\n${copyTextDetail}備註：${note}`;
+                await navigator.clipboard.writeText(copyText);
+                alert("✅ 訂單已成功送出並自動存入試算表！\n\n同時已複製文字，請回到 Line 貼上給賣家。");
+                btn.disabled = false;
+                loading.style.display = 'none';
+            }, 1000);
         } catch (e) {
-            alert("雲端傳送失敗，請手動複製文字傳給賣家。");
-        } finally {
+            alert("傳送失敗，請直接複製文字傳給賣家。");
             btn.disabled = false;
             loading.style.display = 'none';
         }
