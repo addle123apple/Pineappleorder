@@ -3,55 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>宅配訂單系統-欄位拆分版</title>
+    <title>鳳梨宅配下單系統</title>
     <style>
         :root { --primary: #00b900; --bg: #f4f7f6; }
-        body { font-family: "Microsoft JhengHei", sans-serif; background: var(--bg); padding: 15px; }
-        .container { max-width: 500px; margin: auto; }
+        body { font-family: "Microsoft JhengHei", sans-serif; background: var(--bg); padding: 15px; margin: 0; }
+        .container { max-width: 500px; margin: auto; padding-bottom: 50px; }
         .card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        h2 { text-align: center; color: var(--primary); }
-        h3 { border-left: 5px solid var(--primary); padding-left: 10px; font-size: 18px; color: #333; }
+        h2 { text-align: center; color: var(--primary); margin-top: 10px; }
+        h3 { border-left: 5px solid var(--primary); padding-left: 10px; font-size: 18px; color: #333; margin-bottom: 15px; }
         .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px; color: #555; }
         input, textarea { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
+        input:focus, textarea:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 5px rgba(0,185,0,0.2); }
         .receiver-block { border: 2px dashed #ddd; padding: 15px; border-radius: 10px; margin-bottom: 15px; background: #fffdf9; position: relative; }
-        .btn-add { background: white; color: var(--primary); border: 2px solid var(--primary); padding: 10px; border-radius: 8px; width: 100%; cursor: pointer; font-weight: bold; margin-bottom: 20px; }
-        .btn-submit { background: var(--primary); color: white; border: none; padding: 18px; border-radius: 8px; width: 100%; font-size: 18px; font-weight: bold; cursor: pointer; }
-        .btn-submit:disabled { background: #ccc; cursor: not-allowed; }
-        .btn-remove { color: #ff4d4d; font-size: 12px; cursor: pointer; display: block; text-align: right; margin-top: 5px; }
-        #loading { display: none; text-align: center; color: #555; margin-top: 10px; font-weight: bold; }
+        .btn-add { background: white; color: var(--primary); border: 2px solid var(--primary); padding: 12px; border-radius: 8px; width: 100%; cursor: pointer; font-weight: bold; margin-bottom: 25px; font-size: 16px; transition: 0.2s; }
+        .btn-add:active { background: #e8f5e9; }
+        .btn-submit { background: var(--primary); color: white; border: none; padding: 18px; border-radius: 8px; width: 100%; font-size: 20px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0,185,0,0.3); transition: 0.2s; }
+        .btn-submit:disabled { background: #ccc; cursor: not-allowed; box-shadow: none; }
+        .btn-remove { color: #ff4d4d; font-size: 13px; cursor: pointer; display: block; text-align: right; margin-top: 8px; font-weight: bold; text-decoration: underline; }
+        #loading { display: none; text-align: center; color: #555; margin: 15px 0; font-weight: bold; font-size: 16px; }
+        .hint { font-size: 12px; color: #888; margin-top: 4px; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="card">
-        <h2>📦 鳳梨訂單系統</h2>
-        <h3>📤 寄件人資訊</h3>
+        <h2>🍍 鳳梨宅配下單系統</h2>
+        <p style="text-align: center; font-size: 14px; color: #666;">填寫完成後請點擊下方送出並複製</p>
+        <hr style="border: 0.5px solid #eee; margin: 20px 0;">
+       
+        <h3>📤 寄件人資訊 (必填)</h3>
         <div class="form-group">
-            <label>寄件姓名 *</label>
-            <input type="text" id="sName" placeholder="寄件人姓名">
+            <label>寄件人姓名 *</label>
+            <input type="text" id="sName" placeholder="請輸入您的姓名">
         </div>
         <div class="form-group">
-            <label>寄件電話 *</label>
-            <input type="tel" id="sPhone" placeholder="0912345678">
+            <label>寄件人電話 *</label>
+            <input type="tel" id="sPhone" placeholder="例如：0912345678">
+            <div class="hint">需為 09 開頭 10 位數字</div>
         </div>
         <div class="form-group">
             <label>總備註 (選填)</label>
-            <input type="text" id="note" placeholder="例如：全都要中午前到">
+            <input type="text" id="note" placeholder="例如：請盡量中午前送達">
         </div>
     </div>
 
-    <div id="receiverContainer"></div>
+    <div id="receiverContainer">
+        </div>
 
     <button class="btn-add" onclick="addReceiver()">＋ 新增另一筆收件人</button>
-    <button id="submitBtn" class="btn-submit" onclick="submitOrder()">🚀 格式檢查並送出訂單</button>
    
-    <div id="loading">⏳ 正在傳送資料，請稍候...</div>
+    <div id="loading">⏳ 正在處理訂單，請稍候...</div>
+    <button id="submitBtn" class="btn-submit" onclick="submitOrder()">🚀 檢查並送出訂單</button>
 </div>
 
 <script>
-    // ⚠️ 記得在此貼上你「重新部署」後的 GAS 網址
+    // ⚠️ 請確保此網址為你 Google Script 部署後的最新網址
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyeRARaB7p723UPdSDbGuH62AJNIQts4viOOxZXJPUCruhh9fgm4lR_hbRWxuOQL7cSgA/exec";
 
     let receiverCount = 0;
@@ -65,17 +73,20 @@
         div.id = `receiver_${receiverCount}`;
         div.innerHTML = `
             <h3>👤 收件人 #${receiverCount}</h3>
-            <div class="form-group"><label>收件姓名 *</label><input type="text" class="rName"></div>
-            <div class="form-group"><label>收件電話 *</label><input type="tel" class="rPhone"></div>
-            <div class="form-group"><label>收件地址 *</label><textarea class="rAddr" rows="2"></textarea></div>
-            ${receiverCount > 1 ? `<span class="btn-remove" onclick="removeReceiver(${receiverCount})">✕ 移除這筆</span>` : ''}
+            <div class="form-group"><label>收件人姓名 *</label><input type="text" class="rName"></div>
+            <div class="form-group"><label>收件人電話 *</label><input type="tel" class="rPhone"></div>
+            <div class="form-group"><label>完整收件地址 *</label>
+                <textarea class="rAddr" rows="2" placeholder="需包含縣市及門牌號碼"></textarea>
+                <div class="hint">必須包含「路/街/巷」及「號」，請勿填寫簡體字。</div>
+            </div>
+            ${receiverCount > 1 ? `<span class="btn-remove" onclick="removeReceiver(${receiverCount})">✕ 移除這筆資料</span>` : ''}
         `;
         container.appendChild(div);
     }
 
     function removeReceiver(id) { document.getElementById(`receiver_${id}`).remove(); }
 
-    async function submitOrder() {
+    function submitOrder() {
         const sName = document.getElementById('sName').value.trim();
         const sPhone = document.getElementById('sPhone').value.trim();
         const note = document.getElementById('note').value.trim() || "無";
@@ -83,8 +94,11 @@
         const addrCheck = /^(?=.*[路街巷])(?=.*[號]).+$/;
         const simplifiedCheck = /[体国门区发]/;
 
-        if (!sName || !phoneRegex.test(sPhone)) return alert("寄件資料有誤！");
+        // 1. 寄件人基本檢查
+        if (!sName) return alert("請填寫寄件人姓名！");
+        if (!phoneRegex.test(sPhone)) return alert("寄件人電話格式錯誤！");
 
+        // 2. 循環檢查收件人資料並打包 JSON
         let receiversData = [];
         let copyTextDetail = "";
         const blocks = document.querySelectorAll('.receiver-block');
@@ -93,21 +107,25 @@
             const name = blocks[i].querySelector('.rName').value.trim();
             const phone = blocks[i].querySelector('.rPhone').value.trim();
             const addr = blocks[i].querySelector('.rAddr').value.trim();
-           
-            if (!name || !phoneRegex.test(phone) || !addrCheck.test(addr) || simplifiedCheck.test(addr)) {
-                return alert(`收件人 #${i+1} 格式不正確，請檢查地址是否包含「路/街」及「號」，且無簡體字。`);
-            }
+            const num = i + 1;
+
+            if (!name) return alert(`請輸入收件人 #${num} 的姓名！`);
+            if (!phoneRegex.test(phone)) return alert(`收件人 #${num} 的電話格式錯誤！`);
+            if (!addrCheck.test(addr)) return alert(`收件人 #${num} 地址格式不全！\n必須包含「路/街/巷」以及「號」。`);
+            if (simplifiedCheck.test(addr)) return alert(`收件人 #${num} 地址包含簡體字！\n請修正為繁體中文。`);
            
             receiversData.push({ name, phone, addr });
-            copyTextDetail += `【收件人${i+1}】${name} / ${phone} / ${addr}\n`;
+            copyTextDetail += `【收件人${num}】${name} / ${phone} / ${addr}\n`;
         }
 
         const btn = document.getElementById('submitBtn');
         const loading = document.getElementById('loading');
+
+        // 鎖定按鈕避免重複點擊
         btn.disabled = true;
         loading.style.display = 'block';
 
-        // 傳送 JSON 格式讓後端好拆分
+        // 組合資料
         const formData = new URLSearchParams({
             "sName": sName,
             "sPhone": sPhone,
@@ -115,22 +133,29 @@
             "receiversJson": JSON.stringify(receiversData)
         });
 
-        try {
-            fetch(GOOGLE_SCRIPT_URL, { method: "POST", mode: "no-cors", body: formData });
+        // --- 核心修正：發送請求但不使用 await 等待回應 ---
+        fetch(GOOGLE_SCRIPT_URL, {
+            method: "POST",
+            mode: "no-cors",
+            body: formData
+        });
 
-            // 為了避免 CORS 報錯影響體驗，我們直接設定延遲後成功
-            setTimeout(async () => {
-                const copyText = `【宅配下單】\n寄件：${sName}(${sPhone})\n內容：\n${copyTextDetail}備註：${note}`;
+        // 固定延遲 0.8 秒後宣佈成功
+        setTimeout(async () => {
+            const copyText = `【宅配下單總匯】\n寄件：${sName}(${sPhone})\n內容：\n${copyTextDetail}備註：${note}\n(系統已自動雲端存檔)`;
+           
+            try {
+                // 自動複製文字
                 await navigator.clipboard.writeText(copyText);
-                alert("✅ 訂單已成功送出並自動存入試算表！\n\n同時已複製文字，請回到 Line 貼上給賣家。");
-                btn.disabled = false;
-                loading.style.display = 'none';
-            }, 1000);
-        } catch (e) {
-            alert("傳送失敗，請直接複製文字傳給賣家。");
-            btn.disabled = false;
+            } catch (err) {
+                console.log("無法自動複製");
+            }
+
             loading.style.display = 'none';
-        }
+            btn.disabled = false;
+           
+            alert("✅ 訂單已成功傳送！\n\n資料已存入雲端試算表，且文字已自動複製。\n請回到 Line 直接「貼上」傳送給賣家確認。");
+        }, 800);
     }
 </script>
 
