@@ -9,37 +9,28 @@
         body { font-family: "Microsoft JhengHei", sans-serif; background: var(--bg); padding: 10px; margin: 0; font-size: 20px; color: #333; }
         .container { max-width: 600px; margin: auto; padding-bottom: 80px; }
         
-        /* 品牌設計 */
         .brand-header { text-align: center; padding: 25px 0; }
         .brand-logo { font-size: 45px; font-weight: 900; color: var(--primary); text-shadow: 2px 2px 4px rgba(0,0,0,0.1); margin: 0; }
         .brand-tagline { font-size: 18px; color: var(--secondary); font-weight: bold; margin-top: 5px; letter-spacing: 2px; }
         
         .card { background: white; border-radius: 20px; padding: 25px; box-shadow: 0 8px 25px rgba(0,0,0,0.08); margin-bottom: 20px; border: 1px solid #eee; }
         h3 { border-left: 8px solid var(--primary); padding-left: 15px; font-size: 26px; color: #444; margin: 25px 0 15px 0; }
-        label { display: block; margin-bottom: 8px; font-weight: bold; color: #555; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; }
         
-        input, textarea, select { width: 100%; padding: 15px; border: 2px solid #ddd; border-radius: 12px; box-sizing: border-box; font-size: 20px; transition: 0.3s; }
-        input:focus { border-color: var(--primary); outline: none; background: #fffdfa; }
+        input, textarea, select { width: 100%; padding: 15px; border: 2px solid #ddd; border-radius: 12px; box-sizing: border-box; font-size: 20px; margin-bottom: 15px; }
+        .phone-flex { display: flex; gap: 10px; align-items: center; margin-bottom: 15px; }
+        .area-code { width: 100px !important; text-align: center; }
         
-        /* 市話欄位優化 */
-        .phone-flex { display: flex; gap: 10px; align-items: center; }
-        .area-code { width: 100px !important; text-align: center; padding: 15px 5px !important; }
-        .phone-main { flex: 1; }
-
-        .payment-info { background: #fff9f0; border: 2px dashed var(--primary); padding: 18px; border-radius: 15px; margin-top: 15px; display: none; }
+        .payment-info { background: #fff9f0; border: 2px dashed var(--primary); padding: 18px; border-radius: 15px; display: none; margin-bottom: 15px; }
         .receiver-block { border: 3px solid #f1f1f1; padding: 20px; border-radius: 20px; margin-bottom: 25px; background: #fff; position: relative; }
         
-        .btn-add { background: #fff; color: var(--secondary); border: 3px solid var(--secondary); padding: 15px; border-radius: 15px; width: 100%; cursor: pointer; font-weight: bold; font-size: 22px; margin-bottom: 30px; transition: 0.2s; }
-        .btn-add:active { background: var(--secondary); color: white; }
-        
+        .btn-add { background: #fff; color: var(--secondary); border: 3px solid var(--secondary); padding: 15px; border-radius: 15px; width: 100%; cursor: pointer; font-weight: bold; font-size: 22px; margin-bottom: 30px; }
         .btn-submit { background: var(--primary); color: white; border: none; padding: 22px; border-radius: 18px; width: 100%; font-size: 28px; font-weight: bold; cursor: pointer; box-shadow: 0 6px 20px rgba(230,126,34,0.3); }
         
-        /* 鎖定狀態樣式 */
+        /* 鎖定樣式 */
         .locked { background-color: #f2f2f2 !important; color: #888 !important; border-color: #ddd !important; pointer-events: none; cursor: not-allowed; }
-        .btn-submit:disabled, .btn-add:disabled { background: #bdc3c7; border-color: #bdc3c7; box-shadow: none; cursor: not-allowed; }
-        
-        .remove-link { color: #e74c3c; text-align: right; display: block; margin-top: 15px; font-weight: bold; cursor: pointer; text-decoration: underline; }
-        .hint { font-size: 16px; color: #7f8c8d; margin-top:8px; line-height: 1.4; }
+        .remove-link { color: #e74c3c; text-align: right; display: block; margin-top: 5px; font-weight: bold; cursor: pointer; }
+        .hint { font-size: 16px; color: #7f8c8d; margin-top:8px; }
     </style>
 </head>
 <body>
@@ -50,42 +41,32 @@
         <p class="brand-tagline">在地首選．品質如金</p>
     </div>
 
-    <div class="card">
+    <div class="card" id="senderForm">
         <h3>📤 寄件人資訊</h3>
-        <div class="form-group">
-            <label>寄件姓名 *</label>
-            <input type="text" id="sName" placeholder="請輸入您的姓名">
-        </div>
+        <label>寄件姓名 *</label>
+        <input type="text" id="sName" placeholder="請輸入您的姓名">
         
-        <div class="form-group">
-            <label>聯絡電話 *</label>
-            <div style="display:flex; gap:10px; margin-bottom:10px;">
-                <select id="sPhoneType" style="width:35%" onchange="updatePhoneUI('s', this.value)">
-                    <option value="mobile">手機</option>
-                    <option value="home">市話</option>
-                </select>
-                <div id="sPhoneBox" style="flex:1" class="phone-flex">
-                    <input type="tel" id="sPhone" placeholder="0912345678">
-                </div>
+        <label>聯絡電話 *</label>
+        <div class="phone-flex">
+            <select id="sPhoneType" style="width:35%; margin-bottom:0;" onchange="updatePhoneUI('s', this.value)">
+                <option value="mobile">手機</option>
+                <option value="home">市話</option>
+            </select>
+            <div id="sPhoneBox" style="flex:1" class="phone-flex">
+                <input type="tel" id="sPhone" placeholder="0912345678" style="margin-bottom:0;">
             </div>
-            <div id="sPhoneHint" class="hint">手機請填10位數字；市話請選切換。</div>
         </div>
 
-        <div class="form-group">
-            <label>付款方式 *</label>
-            <select id="payMethod" onchange="document.getElementById('bankInfo').style.display=(this.value=='轉帳'?'block':'none')">
-                <option value="現金">現金 (親自交付)</option>
-                <option value="轉帳">銀行轉帳</option>
-            </select>
-            <div id="bankInfo" class="payment-info">
-                <b>🏦 匯款資訊：</b><br>
-                郵局(700) 大樹九曲堂郵局<br>
-                戶名：王黃麗英<br>
-                帳號：<b>01012020516864</b>
-                <p style="font-size:18px; margin:10px 0 0 0; color: #e67e22; font-weight: bold;">
-                    ※ 請在匯款單備註欄寫下「寄件人姓名」及「訂購數量」以利對帳。
-                </p>
-            </div>
+        <label>付款方式 *</label>
+        <select id="payMethod" onchange="document.getElementById('bankInfo').style.display=(this.value=='轉帳'?'block':'none')">
+            <option value="現金">現金 (親自交付)</option>
+            <option value="轉帳">銀行轉帳</option>
+        </select>
+        <div id="bankInfo" class="payment-info">
+            <b>🏦 匯款資訊：</b><br>
+            郵局(700) 大樹九曲堂郵局<br>
+            戶名：王黃麗英 / 帳號：<b>01012020516864</b>
+            <p style="color: #e67e22; font-weight: bold; margin-top:10px;">※ 請在匯款單備註欄寫下「寄件人姓名」及「訂購數量」以利對帳。</p>
         </div>
     </div>
 
@@ -96,8 +77,8 @@
 </div>
 
 <script>
-    // ⚠️ 記得替換為你最新的 Google Apps Script 網址
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwZHjuAP8lU83mGUqGVQlzCsxabEx5BHlCY6KwuXSpklqE7kTYdtyHQJCH595vQ8HwxmQ/exec"; 
+    // ⚠️ 請填入您的 Google Script 網址
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz2EBQQs_DmAqlmrQDLedSwPrFThTmpJ-wCFDn8Ve9mZahu_NXOs1UuQwhWfR5iClyluA/exec"; 
 
     let receiverCount = 0;
     window.onload = () => addReceiver();
@@ -105,9 +86,9 @@
     function updatePhoneUI(prefix, type) {
         const box = document.getElementById(prefix + 'PhoneBox');
         if (type === 'mobile') {
-            box.innerHTML = `<input type="tel" id="${prefix}Phone" placeholder="0912345678">`;
+            box.innerHTML = `<input type="tel" id="${prefix}Phone" placeholder="0912345678" style="margin-bottom:0;">`;
         } else {
-            box.innerHTML = `<input type="tel" id="${prefix}Area" class="area-code" placeholder="區碼"> <span>-</span> <input type="tel" id="${prefix}Number" class="phone-main" placeholder="電話號碼">`;
+            box.innerHTML = `<input type="tel" id="${prefix}Area" class="area-code" placeholder="區碼" style="margin-bottom:0;"> <span>-</span> <input type="tel" id="${prefix}Number" style="flex:1; margin-bottom:0;" placeholder="電話號碼">`;
         }
     }
 
@@ -120,18 +101,16 @@
         let opt = ""; for(let i=1; i<=20; i++) opt += `<option value="${i}">${i} 箱</option>`;
         div.innerHTML = `
             <h3>👤 收件人 #${receiverCount}</h3>
-            <div class="form-group"><label>收件姓名 *</label><input type="text" class="rName" placeholder="收件人姓名"></div>
-            <div class="form-group">
-                <label>收件電話 *</label>
-                <div style="display:flex; gap:10px; margin-bottom:10px;">
-                    <select class="rPhoneType" style="width:35%" onchange="updateRPhoneUI(this)"><option value="mobile">手機</option><option value="home">市話</option></select>
-                    <div class="rPhoneBox phone-flex" style="flex:1"><input type="tel" class="rPhone" placeholder="0912345678"></div>
-                </div>
+            <label>收件姓名 *</label><input type="text" class="rName">
+            <label>收件電話 *</label>
+            <div class="phone-flex">
+                <select class="rPhoneType" style="width:35%; margin-bottom:0;" onchange="updateRPhoneUI(this)"><option value="mobile">手機</option><option value="home">市話</option></select>
+                <div class="rPhoneBox phone-flex" style="flex:1"><input type="tel" class="rPhone" placeholder="0912345678" style="margin-bottom:0;"></div>
             </div>
-            <div class="form-group"><label>收件地址 *</label><textarea class="rAddr" rows="2" placeholder="請包含縣市與門牌號碼"></textarea></div>
-            <div class="form-group"><label>訂購箱數 *</label><select class="rBoxCount">${opt}</select></div>
-            <div class="form-group"><label>收件備註 (如：管理室代收)</label><input type="text" class="rNote" placeholder="若無可留空"></div>
-            ${receiverCount > 1 ? `<span class="remove-link" onclick="this.parentElement.remove()">✕ 移除此收件人</span>` : ''}
+            <label>收件地址 *</label><textarea class="rAddr" rows="2" placeholder="請填寫完整地址"></textarea>
+            <label>訂購箱數 *</label><select class="rBoxCount">${opt}</select>
+            <label>收件備註</label><input type="text" class="rNote" placeholder="若無可留空">
+            ${receiverCount > 1 ? `<span class="remove-link" onclick="this.parentElement.remove()">✕ 移除</span>` : ''}
         `;
         container.appendChild(div);
     }
@@ -139,9 +118,9 @@
     function updateRPhoneUI(select) {
         const box = select.closest('.receiver-block').querySelector('.rPhoneBox');
         if (select.value === 'mobile') {
-            box.innerHTML = `<input type="tel" class="rPhone" placeholder="0912345678">`;
+            box.innerHTML = `<input type="tel" class="rPhone" placeholder="0912345678" style="margin-bottom:0;">`;
         } else {
-            box.innerHTML = `<input type="tel" class="rArea" class="area-code" placeholder="區碼"> <span>-</span> <input type="tel" class="rNumber" class="phone-main" placeholder="電話號碼">`;
+            box.innerHTML = `<input type="tel" class="rArea" class="area-code" placeholder="區碼" style="margin-bottom:0;"> <span>-</span> <input type="tel" class="rNumber" style="flex:1; margin-bottom:0;" placeholder="號碼">`;
         }
     }
 
@@ -157,7 +136,7 @@
     function submitOrder() {
         const sName = document.getElementById('sName').value.trim();
         const sPhone = getPhoneValue('s');
-        if (!sName || !sPhone) return alert("請填寫完整的寄件人資訊！");
+        if (!sName || !sPhone) return alert("寄件資訊未填！");
 
         let receiversData = [];
         const blocks = document.querySelectorAll('.receiver-block');
@@ -165,32 +144,28 @@
             const name = b.querySelector('.rName').value.trim();
             const phone = getPhoneValue('r', b);
             const addr = b.querySelector('.rAddr').value.trim();
-            if (!name || !phone || !addr) return alert("收件資訊不完整，請檢查姓名、電話、地址。");
+            if (!name || !phone || !addr) return alert("收件資訊不完整！");
             receiversData.push({ name, phone, addr, boxCount: b.querySelector('.rBoxCount').value, note: b.querySelector('.rNote').value || "無" });
         }
 
-        // --- 全欄位鎖定邏輯 ---
-        const allInputs = document.querySelectorAll('input, select, textarea');
-        allInputs.forEach(el => el.classList.add('locked'));
-        
+        // 全面鎖定
+        document.querySelectorAll('input, select, textarea, button').forEach(el => {
+            el.classList.add('locked');
+            el.disabled = true;
+        });
         const submitBtn = document.getElementById('submitBtn');
-        const addBtn = document.getElementById('addBtn');
-        submitBtn.disabled = true;
-        addBtn.disabled = true;
         submitBtn.innerText = "⏳ 狀元鳳梨訂單處理中...";
 
-        // 傳送資料
         fetch(GOOGLE_SCRIPT_URL, {
             method: "POST", mode: "no-cors",
             body: new URLSearchParams({ 
-                "sName": sName, 
-                "sPhone": sPhone, 
+                "sName": sName, "sPhone": sPhone, 
                 "payMethod": document.getElementById('payMethod').value, 
                 "receiversJson": JSON.stringify(receiversData) 
             })
         }).then(() => {
             setTimeout(() => {
-                alert("🎉 狀元鳳梨訂單已成功提交！\n我們將儘速為您安排配送。");
+                alert("🎉 狀元鳳梨訂單已成功送出！\n感謝您的訂購。");
                 submitBtn.innerText = "✅ 訂單已完成送出";
             }, 1000);
         });
