@@ -59,7 +59,7 @@
         <div class="form-group">
             <label>付款方式 *</label>
             <select id="payMethod" onchange="togglePayment(this.value)">
-                <option value="現金">現金 (親自交付/貨到付款)</option>
+                <option value="現金">現金 (親自交付)</option>
                 <option value="轉帳">銀行轉帳</option>
             </select>
             <div id="bankInfo" class="payment-info">
@@ -79,14 +79,14 @@
 
     <div id="receiverContainer"></div>
 
-    <button class="btn-add" onclick="addReceiver()">＋ 新增收件地點</button>
+    <button class="btn-add" onclick="addReceiver()">＋ 新增收件人</button>
     
     <div id="loading">⏳ 訂單傳送中，請勿關閉視窗...</div>
     <button id="submitBtn" class="btn-submit" onclick="submitOrder()">✅ 確認送出訂單</button>
 </div>
 
 <script>
-    // ⚠️ 請在此貼上你的新 Google GAS 網址
+    // ⚠️ 請在此貼上你的 Google GAS 網址
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyzw2VREENA2joGuy2PNhPAPaku-7vOxkTXp8QG71n32hg9_c9qMjhO29As31iG8FD6Bw/exec"; 
 
     let receiverCount = 0;
@@ -115,7 +115,6 @@
         div.className = 'receiver-block';
         div.id = `receiver_${receiverCount}`;
         
-        // 產生 1~20 箱選單
         let options = "";
         for(let i=1; i<=20; i++) options += `<option value="${i}">${i} 箱</option>`;
 
@@ -160,7 +159,7 @@
 
     function validatePhone(val, type) {
         if (type === 'mobile') return /^09\d{8}$/.test(val);
-        return /^\d{2,3}-\d{6,8}$/.test(val); // 檢查區碼-號碼格式
+        return /^\d{2,3}-\d{6,8}$/.test(val);
     }
 
     function submitOrder() {
@@ -190,7 +189,6 @@
             totalBoxes += parseInt(boxCount);
         }
 
-        // 預防連續點擊：禁用按鈕
         const btn = document.getElementById('submitBtn');
         btn.disabled = true;
         btn.innerText = "🚫 處理中，請稍候...";
@@ -211,7 +209,6 @@
             alert(`🌟 訂單提交成功！\n\n感謝您的訂購，我們會盡快為您安排出貨。\n總計箱數：${totalBoxes} 箱\n\n(資料已複製，可回 Line 貼上告知賣家)`);
             
             btn.innerText = "✅ 訂單已完成送出";
-            // 保持 disabled 狀態防止重複點擊
         }, 1200);
     }
 </script>
