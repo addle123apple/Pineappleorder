@@ -3,65 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🍍 鳳梨宅配下單系統</title>
+    <title>📦 鳳梨宅配訂購系統</title>
     <style>
-        :root { --primary: #00b900; --bg: #f4f7f6; }
-        body { font-family: "Microsoft JhengHei", sans-serif; background: var(--bg); padding: 15px; margin: 0; }
-        .container { max-width: 500px; margin: auto; padding-bottom: 50px; }
-        .card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        h2 { text-align: center; color: var(--primary); margin-top: 10px; }
-        h3 { border-left: 5px solid var(--primary); padding-left: 10px; font-size: 18px; color: #333; margin-bottom: 15px; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px; color: #555; }
-        input, textarea { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
-        input:focus, textarea:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 5px rgba(0,185,0,0.2); }
-        .receiver-block { border: 2px dashed #ddd; padding: 15px; border-radius: 10px; margin-bottom: 15px; background: #fffdf9; position: relative; }
-        .btn-add { background: white; color: var(--primary); border: 2px solid var(--primary); padding: 12px; border-radius: 8px; width: 100%; cursor: pointer; font-weight: bold; margin-bottom: 25px; font-size: 16px; }
-        .btn-submit { background: var(--primary); color: white; border: none; padding: 18px; border-radius: 8px; width: 100%; font-size: 20px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0,185,0,0.3); }
-        .btn-submit:disabled { background: #ccc; cursor: not-allowed; box-shadow: none; }
-        .btn-remove { color: #ff4d4d; font-size: 13px; cursor: pointer; display: block; text-align: right; margin-top: 8px; font-weight: bold; }
-        #loading { display: none; text-align: center; color: #555; margin: 15px 0; font-weight: bold; }
-        .hint { font-size: 12px; color: #888; margin-top: 4px; }
+        :root { --primary: #28a745; --bg: #f8f9fa; --accent: #d9534f; }
+        body { font-family: "Microsoft JhengHei", sans-serif; background: var(--bg); padding: 10px; margin: 0; font-size: 20px; }
+        .container { max-width: 600px; margin: auto; padding-bottom: 80px; }
+        .card { background: white; border-radius: 15px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        h2 { text-align: center; color: var(--primary); font-size: 28px; margin-bottom: 5px; }
+        h3 { border-left: 8px solid var(--primary); padding-left: 12px; font-size: 22px; color: #333; margin: 25px 0 15px 0; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; color: #444; }
+        input, textarea, select { width: 100%; padding: 15px; border: 2px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 20px; }
+        input:focus { border-color: var(--primary); outline: none; }
+        
+        /* 匯款資訊樣式 */
+        .payment-info { background: #fff4f4; border: 2px solid var(--accent); padding: 15px; border-radius: 10px; margin-top: 15px; display: none; }
+        .payment-info b { color: var(--accent); font-size: 22px; }
+
+        .receiver-block { border: 3px solid #eee; padding: 20px; border-radius: 15px; margin-bottom: 25px; background: #fff; position: relative; }
+        .btn-add { background: #fff; color: var(--primary); border: 3px solid var(--primary); padding: 15px; border-radius: 10px; width: 100%; cursor: pointer; font-weight: bold; font-size: 20px; margin-bottom: 30px; }
+        .btn-submit { background: var(--primary); color: white; border: none; padding: 22px; border-radius: 12px; width: 100%; font-size: 24px; font-weight: bold; cursor: pointer; box-shadow: 0 5px 15px rgba(40,167,69,0.4); }
+        .btn-submit:disabled { background: #6c757d; cursor: not-allowed; box-shadow: none; opacity: 0.8; }
+        
+        .phone-input-group { display: flex; gap: 10px; align-items: center; }
+        .phone-type { width: 40%; }
+        .remove-link { color: #d9534f; text-align: right; display: block; margin-top: 10px; font-weight: bold; text-decoration: underline; cursor: pointer; }
+        #loading { display: none; text-align: center; font-weight: bold; color: var(--primary); margin: 20px 0; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="card">
-        <h2>🍍 鳳梨宅配下單系統</h2>
-        <p style="text-align: center; font-size: 14px; color: #666;">填寫後點擊下方送出，資料將自動存檔</p>
-        <hr style="border: 0.5px solid #eee; margin: 20px 0;">
-       
+        <h2>🍍 鳳梨宅配訂購</h2>
+        <p style="text-align: center; color: #666; font-size: 18px;">感謝您的支持，請填寫正確資訊</p>
+        
         <h3>📤 寄件人資訊</h3>
         <div class="form-group">
-            <label>寄件人姓名 *</label>
-            <input type="text" id="sName" placeholder="請輸入您的姓名">
+            <label>寄件姓名 *</label>
+            <input type="text" id="sName" placeholder="輸入姓名">
         </div>
+        
         <div class="form-group">
-            <label>寄件人電話 *</label>
-            <input type="tel" id="sPhone" placeholder="例如：0912345678">
-            <div class="hint">需為 09 開頭 10 位數字</div>
+            <label>聯絡電話 *</label>
+            <div class="phone-input-group">
+                <select id="sPhoneType" class="phone-type" onchange="togglePhoneHint('sPhone', this.value)">
+                    <option value="mobile">手機</option>
+                    <option value="home">市話</option>
+                </select>
+                <input type="tel" id="sPhone" placeholder="0912345678">
+            </div>
+            <div id="sPhoneHint" style="font-size: 16px; color: #888; margin-top:5px;">格式：09開頭10位數字</div>
         </div>
+
         <div class="form-group">
-            <label>總備註 (選填)</label>
-            <input type="text" id="note" placeholder="例如：請盡量中午前送達">
+            <label>付款方式 *</label>
+            <select id="payMethod" onchange="togglePayment(this.value)">
+                <option value="現金">現金 (親自交付/貨到付款)</option>
+                <option value="轉帳">銀行轉帳</option>
+            </select>
+            <div id="bankInfo" class="payment-info">
+                <b>🏦 匯款資訊：</b><br>
+                大樹九曲堂郵局<br>
+                戶名：王黃麗英<br>
+                帳號：<b>01012020516864</b><br>
+                <p style="margin-bottom:0; color:#333; font-size:18px;">※ 請在匯款單備註欄寫下：<br>「寄件人姓名」及「總訂購箱數」</p>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>總備註</label>
+            <input type="text" id="note" placeholder="如：需中午前到">
         </div>
     </div>
 
     <div id="receiverContainer"></div>
 
-    <button class="btn-add" onclick="addReceiver()">＋ 新增另一筆收件人</button>
-   
-    <div id="loading">⏳ 正在處理訂單，請稍候...</div>
-    <button id="submitBtn" class="btn-submit" onclick="submitOrder()">🚀 檢查並送出訂單</button>
+    <button class="btn-add" onclick="addReceiver()">＋ 新增收件地點</button>
+    
+    <div id="loading">⏳ 訂單傳送中，請勿關閉視窗...</div>
+    <button id="submitBtn" class="btn-submit" onclick="submitOrder()">✅ 確認送出訂單</button>
 </div>
 
 <script>
-    // ⚠️ 請在此處貼上你「重新部署」後的最新 GAS 網址
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxXYS_pNpcjn0jspyJuV-_2dLrMGFvF-k-oH1-CDPzRKLnBS2fq5Z7pWT87VChF5YUIkQ/exec";
+    // ⚠️ 請在此貼上你的新 Google GAS 網址
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyzw2VREENA2joGuy2PNhPAPaku-7vOxkTXp8QG71n32hg9_c9qMjhO29As31iG8FD6Bw/exec"; 
 
     let receiverCount = 0;
     window.onload = () => addReceiver();
+
+    function togglePayment(val) {
+        document.getElementById('bankInfo').style.display = (val === '轉帳') ? 'block' : 'none';
+    }
+
+    function togglePhoneHint(id, type) {
+        const hint = document.getElementById(id + 'Hint');
+        const input = document.getElementById(id);
+        if (type === 'mobile') {
+            hint.innerText = "格式：09開頭10位數字";
+            input.placeholder = "0912345678";
+        } else {
+            hint.innerText = "格式：區碼-電話 (如 07-6512345)";
+            input.placeholder = "07-1234567";
+        }
+    }
 
     function addReceiver() {
         receiverCount++;
@@ -69,68 +114,105 @@
         const div = document.createElement('div');
         div.className = 'receiver-block';
         div.id = `receiver_${receiverCount}`;
+        
+        // 產生 1~20 箱選單
+        let options = "";
+        for(let i=1; i<=20; i++) options += `<option value="${i}">${i} 箱</option>`;
+
         div.innerHTML = `
             <h3>👤 收件人 #${receiverCount}</h3>
-            <div class="form-group"><label>收件人姓名 *</label><input type="text" class="rName"></div>
-            <div class="form-group"><label>收件人電話 *</label><input type="tel" class="rPhone"></div>
-            <div class="form-group"><label>完整收件地址 *</label>
-                <textarea class="rAddr" rows="2" placeholder="需包含縣市及門牌號碼"></textarea>
-                <div class="hint">必須包含「路/街/巷」及「號」。</div>
+            <div class="form-group"><label>收件姓名 *</label><input type="text" class="rName"></div>
+            <div class="form-group">
+                <label>收件電話 *</label>
+                <div class="phone-input-group">
+                    <select class="rPhoneType" onchange="updateRHint(this)">
+                        <option value="mobile">手機</option>
+                        <option value="home">市話</option>
+                    </select>
+                    <input type="tel" class="rPhone" placeholder="0912345678">
+                </div>
+                <div class="rHint" style="font-size: 16px; color: #888; margin-top:5px;">格式：09開頭10位數字</div>
             </div>
-            ${receiverCount > 1 ? `<span class="btn-remove" onclick="removeReceiver(${receiverCount})">✕ 移除這筆</span>` : ''}
+            <div class="form-group"><label>收件地址 *</label><textarea class="rAddr" rows="2"></textarea></div>
+            <div class="form-group">
+                <label>訂購箱數 *</label>
+                <select class="rBoxCount">${options}</select>
+            </div>
+            ${receiverCount > 1 ? `<span class="remove-link" onclick="removeReceiver(${receiverCount})">✕ 移除此收件人</span>` : ''}
         `;
         container.appendChild(div);
     }
 
+    function updateRHint(selectEl) {
+        const block = selectEl.closest('.receiver-block');
+        const hint = block.querySelector('.rHint');
+        const input = block.querySelector('.rPhone');
+        if (selectEl.value === 'mobile') {
+            hint.innerText = "格式：09開頭10位數字";
+            input.placeholder = "0912345678";
+        } else {
+            hint.innerText = "格式：區碼-電話 (如 07-6512345)";
+            input.placeholder = "07-1234567";
+        }
+    }
+
     function removeReceiver(id) { document.getElementById(`receiver_${id}`).remove(); }
+
+    function validatePhone(val, type) {
+        if (type === 'mobile') return /^09\d{8}$/.test(val);
+        return /^\d{2,3}-\d{6,8}$/.test(val); // 檢查區碼-號碼格式
+    }
 
     function submitOrder() {
         const sName = document.getElementById('sName').value.trim();
         const sPhone = document.getElementById('sPhone').value.trim();
+        const sPhoneType = document.getElementById('sPhoneType').value;
+        const payMethod = document.getElementById('payMethod').value;
         const note = document.getElementById('note').value.trim() || "無";
-        const phoneRegex = /^09\d{8}$/;
-        const addrCheck = /^(?=.*[路街巷])(?=.*[號]).+$/;
-        const simplifiedCheck = /[体国门区发]/;
 
-        if (!sName || !phoneRegex.test(sPhone)) return alert("寄件人資料有誤！");
+        if (!sName || !validatePhone(sPhone, sPhoneType)) return alert("寄件人資料或電話格式有誤！");
 
         let receiversData = [];
-        let copyTextDetail = "";
+        let totalBoxes = 0;
         const blocks = document.querySelectorAll('.receiver-block');
 
         for (let i = 0; i < blocks.length; i++) {
             const name = blocks[i].querySelector('.rName').value.trim();
             const phone = blocks[i].querySelector('.rPhone').value.trim();
+            const phoneType = blocks[i].querySelector('.rPhoneType').value;
             const addr = blocks[i].querySelector('.rAddr').value.trim();
-           
-            if (!name || !phoneRegex.test(phone) || !addrCheck.test(addr) || simplifiedCheck.test(addr)) {
-                return alert(`收件人 #${i+1} 資料有誤或包含簡體字。地址需有「路/街/巷」及「號」。`);
+            const boxCount = blocks[i].querySelector('.rBoxCount').value;
+            
+            if (!name || !validatePhone(phone, phoneType) || !addr.includes('號')) {
+                return alert(`收件人 #${i+1} 資料格式不正確（請檢查電話或地址）。`);
             }
-            receiversData.push({ name, phone, addr });
-            copyTextDetail += `【收件人${i+1}】${name} / ${phone} / ${addr}\n`;
+            receiversData.push({ name, phone, addr, boxCount });
+            totalBoxes += parseInt(boxCount);
         }
 
+        // 預防連續點擊：禁用按鈕
         const btn = document.getElementById('submitBtn');
-        const loading = document.getElementById('loading');
         btn.disabled = true;
-        loading.style.display = 'block';
+        btn.innerText = "🚫 處理中，請稍候...";
+        document.getElementById('loading').style.display = 'block';
 
         const formData = new URLSearchParams({
-            "sName": sName, "sPhone": sPhone, "note": note,
+            "sName": sName, "sPhone": sPhone, "payMethod": payMethod, "note": note,
             "receiversJson": JSON.stringify(receiversData)
         });
 
-        // 非同步傳送，不使用 await 以防網頁卡住
         fetch(GOOGLE_SCRIPT_URL, { method: "POST", mode: "no-cors", body: formData });
 
         setTimeout(async () => {
-            const copyText = `【宅配下單】\n寄件：${sName}(${sPhone})\n內容：\n${copyTextDetail}備註：${note}`;
-            try { await navigator.clipboard.writeText(copyText); } catch (err) {}
+            const copyText = `【鳳梨訂單】寄件：${sName} / 總箱數：${totalBoxes}箱\n付款：${payMethod}\n訂單已送出，感謝您的訂購！`;
+            try { await navigator.clipboard.writeText(copyText); } catch (e) {}
 
-            loading.style.display = 'none';
-            btn.disabled = false;
-            alert("✅ 訂單已傳送至雲端試算表！\n\n文字已自動複製，請回 Line 貼上傳送即可。");
-        }, 800);
+            document.getElementById('loading').style.display = 'none';
+            alert(`🌟 訂單提交成功！\n\n感謝您的訂購，我們會盡快為您安排出貨。\n總計箱數：${totalBoxes} 箱\n\n(資料已複製，可回 Line 貼上告知賣家)`);
+            
+            btn.innerText = "✅ 訂單已完成送出";
+            // 保持 disabled 狀態防止重複點擊
+        }, 1200);
     }
 </script>
 
