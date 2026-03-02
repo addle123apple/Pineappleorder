@@ -18,10 +18,15 @@
         label { display: block; margin-bottom: 8px; font-weight: bold; }
         
         input, textarea, select { width: 100%; padding: 15px; border: 2px solid #ddd; border-radius: 12px; box-sizing: border-box; font-size: 20px; margin-bottom: 15px; }
-        .phone-flex { display: flex; gap: 10px; align-items: center; margin-bottom: 15px; }
-        .area-code { width: 100px !important; text-align: center; }
         
-        .payment-info { background: #fff9f0; border: 2px dashed var(--primary); padding: 18px; border-radius: 15px; display: none; margin-bottom: 15px; }
+        /* 電話欄位比例優化 */
+        .phone-row { display: flex; gap: 8px; align-items: center; margin-bottom: 15px; width: 100%; }
+        .phone-type { width: 30% !important; flex-shrink: 0; }
+        .phone-input-box { flex-grow: 1; display: flex; gap: 5px; align-items: center; }
+        .area-code { width: 75px !important; text-align: center; flex-shrink: 0; } /* 縮小區碼框 */
+        .phone-main { flex: 1; min-width: 0; } /* 讓主號碼佔據剩餘空間 */
+
+        .payment-info { background: #fff9f0; border: 2px dashed var(--primary); padding: 18px; border-radius: 15px; display: none; margin-bottom: 15px; line-height: 1.6; }
         .receiver-block { border: 3px solid #f1f1f1; padding: 20px; border-radius: 20px; margin-bottom: 25px; background: #fff; position: relative; }
         
         .btn-add { background: #fff; color: var(--secondary); border: 3px solid var(--secondary); padding: 15px; border-radius: 15px; width: 100%; cursor: pointer; font-weight: bold; font-size: 22px; margin-bottom: 30px; }
@@ -39,18 +44,18 @@
         <p class="brand-tagline">在地首選．品質如金</p>
     </div>
 
-    <div class="card" id="senderForm">
+    <div class="card">
         <h3>📤 寄件人資訊</h3>
         <label>寄件姓名 *</label>
         <input type="text" id="sName" placeholder="請輸入您的姓名">
         
         <label>聯絡電話 *</label>
-        <div class="phone-flex">
-            <select id="sPhoneType" style="width:35%; margin-bottom:0;" onchange="updatePhoneUI('s', this.value)">
+        <div class="phone-row">
+            <select id="sPhoneType" class="phone-type" onchange="updatePhoneUI('s', this.value)" style="margin-bottom:0;">
                 <option value="mobile">手機</option>
                 <option value="home">市話</option>
             </select>
-            <div id="sPhoneBox" style="flex:1" class="phone-flex">
+            <div id="sPhoneBox" class="phone-input-box">
                 <input type="tel" id="sPhone" placeholder="0912345678" style="margin-bottom:0;">
             </div>
         </div>
@@ -61,9 +66,10 @@
             <option value="轉帳">銀行轉帳</option>
         </select>
         <div id="bankInfo" class="payment-info">
-            <b>🏦 匯款資訊：</b><br>
+            🏦 <b>匯款資訊：</b><br>
             郵局(700) 大樹九曲堂郵局<br>
-            戶名：王黃麗英 / 帳號：<b>01012020516864</b>
+            戶名：王黃麗英<br>
+            帳號：<span style="font-size: 24px; color: #d35400; display: block; margin: 5px 0;"><b>01012020516864</b></span>
             <p style="color: #e67e22; font-weight: bold; margin-top:10px;">※ 請在匯款單備註欄寫下「寄件人姓名」及「訂購數量」以利對帳。</p>
         </div>
     </div>
@@ -85,7 +91,7 @@
         if (type === 'mobile') {
             box.innerHTML = `<input type="tel" id="${prefix}Phone" placeholder="0912345678" style="margin-bottom:0;">`;
         } else {
-            box.innerHTML = `<input type="tel" id="${prefix}Area" class="area-code" placeholder="區碼" style="margin-bottom:0;"> <span>-</span> <input type="tel" id="${prefix}Number" style="flex:1; margin-bottom:0;" placeholder="電話號碼">`;
+            box.innerHTML = `<input type="tel" id="${prefix}Area" class="area-code" placeholder="區碼" style="margin-bottom:0;"> <span>-</span> <input type="tel" id="${prefix}Number" class="phone-main" placeholder="電話號碼" style="margin-bottom:0;">`;
         }
     }
 
@@ -97,14 +103,13 @@
         div.id = `receiver_${receiverCount}`;
         let opt = ""; for(let i=1; i<=20; i++) opt += `<option value="${i}">${i} 箱</option>`;
         
-        // --- 這裡修正了備註的提示文字 ---
         div.innerHTML = `
             <h3>👤 收件人 #${receiverCount}</h3>
             <label>收件姓名 *</label><input type="text" class="rName">
             <label>收件電話 *</label>
-            <div class="phone-flex">
-                <select class="rPhoneType" style="width:35%; margin-bottom:0;" onchange="updateRPhoneUI(this)"><option value="mobile">手機</option><option value="home">市話</option></select>
-                <div class="rPhoneBox phone-flex" style="flex:1"><input type="tel" class="rPhone" placeholder="0912345678" style="margin-bottom:0;"></div>
+            <div class="phone-row">
+                <select class="rPhoneType phone-type" onchange="updateRPhoneUI(this)" style="margin-bottom:0;"><option value="mobile">手機</option><option value="home">市話</option></select>
+                <div class="rPhoneBox phone-input-box"><input type="tel" class="rPhone" placeholder="0912345678" style="margin-bottom:0;"></div>
             </div>
             <label>收件地址 *</label><textarea class="rAddr" rows="2" placeholder="請填寫完整地址"></textarea>
             <label>訂購箱數 *</label><select class="rBoxCount">${opt}</select>
@@ -119,7 +124,7 @@
         if (select.value === 'mobile') {
             box.innerHTML = `<input type="tel" class="rPhone" placeholder="0912345678" style="margin-bottom:0;">`;
         } else {
-            box.innerHTML = `<input type="tel" class="rArea" class="area-code" placeholder="區碼" style="margin-bottom:0;"> <span>-</span> <input type="tel" class="rNumber" style="flex:1; margin-bottom:0;" placeholder="號碼">`;
+            box.innerHTML = `<input type="tel" class="rArea" class="area-code" placeholder="區碼" style="margin-bottom:0;"> <span>-</span> <input type="tel" class="rNumber" class="phone-main" placeholder="電話號碼" style="margin-bottom:0;">`;
         }
     }
 
