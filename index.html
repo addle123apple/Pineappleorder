@@ -16,7 +16,6 @@
         label { display: block; margin-bottom: 8px; font-weight: bold; }
         input, textarea, select { width: 100%; padding: 15px; border: 2px solid #ddd; border-radius: 12px; box-sizing: border-box; font-size: 20px; margin-bottom: 15px; }
         
-        /* 電話比例優化 */
         .phone-row { display: flex; gap: 8px; align-items: center; margin-bottom: 15px; width: 100%; }
         .phone-type { width: 30% !important; flex-shrink: 0; }
         .phone-input-box { flex-grow: 1; display: flex; gap: 5px; align-items: center; }
@@ -63,7 +62,7 @@
             郵局(700) 大樹九曲堂郵局<br>
             戶名：王黃麗英<br>
             帳號：<span style="font-size: 24px; color: #d35400; display: block; margin: 5px 0;"><b>01012020516864</b></span>
-            <p style="color: #e67e22; font-weight: bold; margin-top:10px;">※ 請在匯款單備註欄寫下「寄件人姓名」及「訂購數量」。</p>
+            <p style="color: #e67e22; font-weight: bold; margin-top:10px;">※ 請於備註註明姓名/數量以利對帳。</p>
         </div>
     </div>
 
@@ -117,25 +116,20 @@
         }
     }
 
-    // 驗證電話格式邏輯
-    function validatePhone(type, val1, val2 = "") {
-        if (type === 'mobile') {
-            return val1.length === 10 && val1.startsWith("09");
-        } else {
-            return val1.length >= 2 && val2.length >= 7;
-        }
-    }
-
     function getPhoneData(prefix, block = document) {
         const isS = prefix === 's';
         const type = isS ? document.getElementById('sPhoneType').value : block.querySelector('.rPhoneType').value;
         if (type === 'mobile') {
             const val = (isS ? document.getElementById('sPhone') : block.querySelector('.rPhone')).value.trim();
-            return { type: 'mobile', v1: val, v2: "", isValid: validatePhone('mobile', val) };
+            // 嚴格檢查：必須是 09 開頭且滿 10 碼
+            const isValid = /^09\d{8}$/.test(val);
+            return { type: 'mobile', v1: val, v2: "", isValid: isValid };
         } else {
             const a = (isS ? document.getElementById('sArea') : block.querySelector('.rArea')).value.trim();
             const n = (isS ? document.getElementById('sNumber') : block.querySelector('.rNumber')).value.trim();
-            return { type: 'home', v1: a, v2: n, isValid: validatePhone('home', a, n) };
+            // 市話檢查：區碼 2-3 碼，號碼 7-8 碼
+            const isValid = a.length >= 2 && n.length >= 7;
+            return { type: 'home', v1: a, v2: n, isValid: isValid };
         }
     }
 
@@ -144,7 +138,7 @@
         const sP = getPhoneData('s');
         
         if (!sName) return alert("請填寫寄件人姓名");
-        if (!sP.isValid) return alert("寄件人電話格式錯誤（手機需10碼，市話需含區碼）");
+        if (!sP.isValid) return alert("寄件人電話格式錯誤！\n手機請填 10 碼 (09...)，市話請含區碼。");
 
         let receiversData = [];
         const blocks = document.querySelectorAll('.receiver-block');
@@ -152,29 +146,25 @@
             const name = b.querySelector('.rName').value.trim();
             const rP = getPhoneData('r', b);
             const addr = b.querySelector('.rAddr').value.trim();
-            
             if (!name || !addr) return alert("收件人資訊不完整！");
             if (!rP.isValid) return alert(`收件人 ${name} 的電話格式錯誤！`);
-            
             receiversData.push({ 
-                name, 
-                phone: rP.type === 'mobile' ? rP.v1 : `${rP.v1}-${rP.v2}`, 
-                addr, 
-                boxCount: b.querySelector('.rBoxCount').value, 
+                name, phone: rP.type === 'mobile' ? rP.v1 : `${rP.v1}-${rP.v2}`, 
+                addr, boxCount: b.querySelector('.rBoxCount').value, 
                 note: b.querySelector('.rNote').value || "無" 
             });
         }
 
-        // 立即鎖定介面 (提升體感速度)
-        document.querySelectorAll('.remove-link').forEach(el => el.remove());
-        document.querySelectorAll('input, select, textarea, button').forEach(el => {
-            el.classList.add('locked');
-            el.disabled = true;
-        });
+        // 開始送出程序
         const submitBtn = document.getElementById('submitBtn');
-        submitBtn.innerText = "🚀 訂單傳送中...";
+        submitBtn.disabled = true;
+        submitBtn.innerText = "⏳ 正在與系統連線中...";
 
-        // 優化：發送後立即顯示成功，不讓客戶在那邊乾等確認回傳
+        // 設置超時提醒，如果 6 秒沒反應，提醒用戶
+        const timeoutTip = setTimeout(() => {
+            submitBtn.innerText = "⏳ 網路較慢，請勿離開頁面...";
+        }, 6000);
+
         fetch(GOOGLE_SCRIPT_URL, {
             method: "POST", mode: "no-cors",
             body: new URLSearchParams({ 
@@ -182,13 +172,26 @@
                 "payMethod": document.getElementById('payMethod').value, 
                 "receiversJson": JSON.stringify(receiversData) 
             })
+        }).then(() => {
+            // 收到回應後 (不論成功與否，no-cors 都會進到這裡)
+            clearTimeout(timeoutTip);
+            
+            // 成功後的 UI 處理
+            document.querySelectorAll('.remove-link').forEach(el => el.remove());
+            document.querySelectorAll('input, select, textarea, button').forEach(el => {
+                el.classList.add('locked');
+                el.disabled = true;
+            });
+            
+            alert("🎉 狀元鳳梨訂單已送出成功！\n感謝您的訂購。");
+            submitBtn.innerText = "✅ 訂單已完成送出";
+        }).catch(err => {
+            // 只有在完全連不上網路時才會進 catch
+            clearTimeout(timeoutTip);
+            submitBtn.disabled = false;
+            submitBtn.innerText = "❌ 送出失敗，請重試";
+            alert("連線發生問題，請檢查網路後重新送出。");
         });
-
-        // 體感優化：0.8秒後直接宣判成功
-        setTimeout(() => {
-            alert("🎉 狀元鳳梨訂單已送出！\n我們會盡快為您處理。");
-            submitBtn.innerText = "✅ 訂單已完成";
-        }, 800);
     }
 </script>
 </body>
