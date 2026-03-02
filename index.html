@@ -8,32 +8,27 @@
         :root { --primary: #e67e22; --secondary: #27ae60; --bg: #fffcf0; }
         body { font-family: "Microsoft JhengHei", sans-serif; background: var(--bg); padding: 10px; margin: 0; font-size: 20px; color: #333; }
         .container { max-width: 600px; margin: auto; padding-bottom: 80px; }
-        
         .brand-header { text-align: center; padding: 25px 0; }
         .brand-logo { font-size: 45px; font-weight: 900; color: var(--primary); text-shadow: 2px 2px 4px rgba(0,0,0,0.1); margin: 0; }
         .brand-tagline { font-size: 18px; color: var(--secondary); font-weight: bold; margin-top: 5px; letter-spacing: 2px; }
-        
         .card { background: white; border-radius: 20px; padding: 25px; box-shadow: 0 8px 25px rgba(0,0,0,0.08); margin-bottom: 20px; border: 1px solid #eee; }
         h3 { border-left: 8px solid var(--primary); padding-left: 15px; font-size: 26px; color: #444; margin: 25px 0 15px 0; }
         label { display: block; margin-bottom: 8px; font-weight: bold; }
-        
         input, textarea, select { width: 100%; padding: 15px; border: 2px solid #ddd; border-radius: 12px; box-sizing: border-box; font-size: 20px; margin-bottom: 15px; }
         
-        /* 電話欄位比例優化 */
+        /* 電話比例優化 */
         .phone-row { display: flex; gap: 8px; align-items: center; margin-bottom: 15px; width: 100%; }
         .phone-type { width: 30% !important; flex-shrink: 0; }
         .phone-input-box { flex-grow: 1; display: flex; gap: 5px; align-items: center; }
-        .area-code { width: 75px !important; text-align: center; flex-shrink: 0; } /* 縮小區碼框 */
-        .phone-main { flex: 1; min-width: 0; } /* 讓主號碼佔據剩餘空間 */
+        .area-code { width: 75px !important; text-align: center; flex-shrink: 0; }
+        .phone-main { flex: 1; min-width: 0; }
 
         .payment-info { background: #fff9f0; border: 2px dashed var(--primary); padding: 18px; border-radius: 15px; display: none; margin-bottom: 15px; line-height: 1.6; }
         .receiver-block { border: 3px solid #f1f1f1; padding: 20px; border-radius: 20px; margin-bottom: 25px; background: #fff; position: relative; }
-        
         .btn-add { background: #fff; color: var(--secondary); border: 3px solid var(--secondary); padding: 15px; border-radius: 15px; width: 100%; cursor: pointer; font-weight: bold; font-size: 22px; margin-bottom: 30px; }
         .btn-submit { background: var(--primary); color: white; border: none; padding: 22px; border-radius: 18px; width: 100%; font-size: 28px; font-weight: bold; cursor: pointer; box-shadow: 0 6px 20px rgba(230,126,34,0.3); }
-        
         .locked { background-color: #f2f2f2 !important; color: #888 !important; border-color: #ddd !important; pointer-events: none; cursor: not-allowed; }
-        .remove-link { color: #e74c3c; text-align: right; display: block; margin-top: 5px; font-weight: bold; cursor: pointer; }
+        .remove-link { color: #e74c3c; text-align: right; display: block; margin-top: 5px; font-weight: bold; cursor: pointer; text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -48,7 +43,6 @@
         <h3>📤 寄件人資訊</h3>
         <label>寄件姓名 *</label>
         <input type="text" id="sName" placeholder="請輸入您的姓名">
-        
         <label>聯絡電話 *</label>
         <div class="phone-row">
             <select id="sPhoneType" class="phone-type" onchange="updatePhoneUI('s', this.value)" style="margin-bottom:0;">
@@ -59,7 +53,6 @@
                 <input type="tel" id="sPhone" placeholder="0912345678" style="margin-bottom:0;">
             </div>
         </div>
-
         <label>付款方式 *</label>
         <select id="payMethod" onchange="document.getElementById('bankInfo').style.display=(this.value=='轉帳'?'block':'none')">
             <option value="現金">現金 (親自交付)</option>
@@ -75,7 +68,6 @@
     </div>
 
     <div id="receiverContainer"></div>
-
     <button id="addBtn" class="btn-add" onclick="addReceiver()">＋ 新增另一位收件人</button>
     <button id="submitBtn" class="btn-submit" onclick="submitOrder()">✅ 確認送出狀元鳳梨訂單</button>
 </div>
@@ -83,7 +75,6 @@
 <script>
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz2EBQQs_DmAqlmrQDLedSwPrFThTmpJ-wCFDn8Ve9mZahu_NXOs1UuQwhWfR5iClyluA/exec"; 
 
-    let receiverCount = 0;
     window.onload = () => addReceiver();
 
     function updatePhoneUI(prefix, type) {
@@ -96,15 +87,13 @@
     }
 
     function addReceiver() {
-        receiverCount++;
         const container = document.getElementById('receiverContainer');
+        const count = container.children.length + 1;
         const div = document.createElement('div');
         div.className = 'receiver-block';
-        div.id = `receiver_${receiverCount}`;
         let opt = ""; for(let i=1; i<=20; i++) opt += `<option value="${i}">${i} 箱</option>`;
-        
         div.innerHTML = `
-            <h3>👤 收件人 #${receiverCount}</h3>
+            <h3>👤 收件人 #${count}</h3>
             <label>收件姓名 *</label><input type="text" class="rName">
             <label>收件電話 *</label>
             <div class="phone-row">
@@ -113,8 +102,8 @@
             </div>
             <label>收件地址 *</label><textarea class="rAddr" rows="2" placeholder="請填寫完整地址"></textarea>
             <label>訂購箱數 *</label><select class="rBoxCount">${opt}</select>
-            <label>收件備註 (如：中午前送達、週六收貨)</label><input type="text" class="rNote" placeholder="若無可留空">
-            ${receiverCount > 1 ? `<span class="remove-link" onclick="this.parentElement.remove()">✕ 移除</span>` : ''}
+            <label>收件備註 (如：中午前送達、週六收貨)</label><input type="text" class="rNote">
+            ${count > 1 ? `<span class="remove-link" onclick="this.parentElement.remove()">✕ 移除此收件人</span>` : ''}
         `;
         container.appendChild(div);
     }
@@ -152,10 +141,13 @@
             receiversData.push({ name, phone, addr, boxCount: b.querySelector('.rBoxCount').value, note: b.querySelector('.rNote').value || "無" });
         }
 
+        // --- 全面鎖定與清理邏輯 ---
+        document.querySelectorAll('.remove-link').forEach(el => el.remove()); // 移除所有「移除」連結
         document.querySelectorAll('input, select, textarea, button').forEach(el => {
             el.classList.add('locked');
             el.disabled = true;
         });
+        
         const submitBtn = document.getElementById('submitBtn');
         submitBtn.innerText = "⏳ 狀元鳳梨訂單處理中...";
 
@@ -168,7 +160,7 @@
             })
         }).then(() => {
             setTimeout(() => {
-                alert("🎉 狀元鳳梨訂單已成功送出！\n感謝您的訂購。");
+                alert("🎉 狀元鳳梨訂單已成功送出！");
                 submitBtn.innerText = "✅ 訂單已完成送出";
             }, 1000);
         });
