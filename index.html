@@ -7,42 +7,43 @@
     <script src="https://cdn.jsdelivr.net/npm/tw-city-selector@2.1.1/dist/tw-city-selector.min.js"></script>
     <style>
         :root { --primary: #e67e22; --secondary: #27ae60; --bg: #fffcf0; }
-        
-        /* 縮小整體字體與間距，防止大字體模式破壞版面 */
         body { font-family: "Microsoft JhengHei", sans-serif; background: var(--bg); padding: 8px; margin: 0; font-size: 18px; color: #333; line-height: 1.4; }
         .container { max-width: 500px; margin: auto; padding-bottom: 50px; }
-        
         .brand-header { text-align: center; padding: 15px 0; }
         .brand-logo { font-size: 36px; font-weight: 900; color: var(--primary); margin: 0; }
         .brand-tagline { font-size: 16px; color: var(--secondary); font-weight: bold; margin-top: 3px; letter-spacing: 1px; }
-        
         .card { background: white; border-radius: 15px; padding: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 15px; border: 1px solid #eee; }
         h3 { border-left: 6px solid var(--primary); padding-left: 10px; font-size: 22px; color: #444; margin: 15px 0 10px 0; }
         label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 17px; }
         
-        /* 強化彈性佈局，防止擠壓 */
-        input, textarea, select { width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 17px; margin-bottom: 12px; appearance: none; -webkit-appearance: none; }
+        /* 統一輸入框與選單樣式，確保背景為白，避免灰底誤會 */
+        input, textarea, select { 
+            width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 10px; 
+            box-sizing: border-box; font-size: 17px; margin-bottom: 12px; 
+            background-color: #ffffff !important; color: #333;
+        }
+
+        /* 為下拉選單增加下拉小箭頭圖示 */
+        select {
+            appearance: none; -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M10.293 3.293L6 7.586 1.707 3.293A1 1 0 00.293 4.707l5 5a1 1 0 001.414 0l5-5a1 1 0 10-1.414-1.414z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 12px center; padding-right: 35px;
+        }
         
         .phone-row, .address-grid { display: flex; gap: 5px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
         .phone-type, .addr-select { width: 100px !important; flex-grow: 1; margin-bottom: 0; }
         .phone-input-box { flex-grow: 2; display: flex; gap: 4px; align-items: center; min-width: 180px; }
-        .area-code, .zip-code { width: 65px !important; text-align: center; margin-bottom: 0; background: #f9f9f9; }
+        .area-code { width: 65px !important; text-align: center; margin-bottom: 0; background: #fff !important; }
+        .zip-code { width: 65px !important; text-align: center; margin-bottom: 0; background: #f0f0f0 !important; color: #777; border: 1px solid #ddd; }
         .phone-main { flex: 1; min-width: 110px; margin-bottom: 0; }
-
+        
         .payment-info { background: #fff9f0; border: 2px dashed var(--primary); padding: 12px; border-radius: 12px; display: none; margin-bottom: 12px; font-size: 16px; }
         .receiver-block { border: 2px solid #f1f1f1; padding: 15px; border-radius: 15px; margin-bottom: 20px; background: #fff; position: relative; }
-        
         .btn-add { background: #fff; color: var(--secondary); border: 2px solid var(--secondary); padding: 12px; border-radius: 10px; width: 100%; cursor: pointer; font-weight: bold; font-size: 18px; margin-bottom: 20px; }
         .btn-submit { background: var(--primary); color: white; border: none; padding: 18px; border-radius: 12px; width: 100%; font-size: 22px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 12px rgba(230,126,34,0.2); }
-        
         .locked { background-color: #f2f2f2 !important; color: #888 !important; pointer-events: none; }
-        .remove-link { color: #e74c3c; text-align: right; display: block; margin-top: 5px; font-weight: bold; cursor: pointer; font-size: 15px; }
-
-        /* 針對小螢幕或大字體模式的調整 */
-        @media (max-width: 400px) {
-            .phone-input-box { width: 100%; }
-            .address-grid .addr-select { width: 48% !important; }
-        }
+        .remove-link { color: #e74c3c; text-align: right; display: block; margin-top: 5px; font-weight: bold; cursor: pointer; font-size: 15px; text-decoration: underline; }
+        @media (max-width: 400px) { .phone-input-box { width: 100%; } .address-grid .addr-select { width: 48% !important; } }
     </style>
 </head>
 <body>
@@ -123,7 +124,8 @@
                 <input type="text" class="rAddrDetail" placeholder="詳細地址 (如：井腳1號)">
             </div>
             <label>訂購箱數 *</label><select class="rBoxCount">${opt}</select>
-            <label>收件備註</label><input type="text" class="rNote" placeholder="若無可不填">
+            <label>收件備註</label>
+            <input type="text" class="rNote" placeholder="如：中午前到貨、週六才能收貨，若無可不填。">
             ${count > 1 ? `<span class="remove-link" onclick="this.parentElement.remove()">✕ 移除此位</span>` : ''}
         `;
         container.appendChild(div);
@@ -157,7 +159,7 @@
     function submitOrder() {
         const sName = document.getElementById('sName').value.trim();
         const sP = getPhoneData('s');
-        if (!sName || !sP.isValid) return alert("寄件資訊填寫有誤！");
+        if (!sName || !sP.isValid) return alert("寄件資訊填寫有誤！請確認姓名與 10 碼手機。");
 
         let receiversData = [];
         const blocks = document.querySelectorAll('.receiver-block');
@@ -169,8 +171,8 @@
             const zip = b.querySelector('.zipcode').value;
             const detail = b.querySelector('.rAddrDetail').value.trim();
 
-            if (!name || !rP.isValid) return alert(`收件人 ${name || '#'} 資訊錯誤`);
-            if (!county || !dist || !detail.includes("號")) return alert(`請填寫收件人 ${name} 完整地址(需含門牌號)`);
+            if (!name || !rP.isValid) return alert(`收件人 ${name || '#'} 資訊或電話錯誤`);
+            if (!county || !dist || !detail.includes("號")) return alert(`請填寫收件人 ${name} 完整地址(需選擇縣市並包含門牌號)`);
 
             receiversData.push({ 
                 name, phone: rP.type === 'mobile' ? rP.v1 : `${rP.v1}-${rP.v2}`, 
@@ -195,7 +197,11 @@
             document.querySelectorAll('.remove-link').forEach(el => el.remove());
             document.querySelectorAll('input, select, textarea, button').forEach(el => { el.classList.add('locked'); el.disabled = true; });
             alert("🎉 訂單成功！感謝訂購狀元鳳梨。");
-            submitBtn.innerText = "✅ 訂單已送出";
+            submitBtn.innerText = "✅ 訂單已完成";
+        }).catch(err => {
+            submitBtn.disabled = false;
+            submitBtn.innerText = "❌ 發送失敗，請再點一次";
+            alert("連線不穩定，請重新點擊送出。");
         });
     }
 </script>
